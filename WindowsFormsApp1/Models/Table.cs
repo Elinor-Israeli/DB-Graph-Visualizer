@@ -2,7 +2,7 @@
 // Namespace for all model classes used in the AdventureWorksGraph application
 using System.Collections.Generic;
 
-namespace AdventureWorksGraph.Models
+namespace AdventureWorksGraph
 {
     /// <summary>
     /// Represents a single table in the database schema.

@@ -1,43 +1,49 @@
-using System;
+﻿using System;
 using System.Drawing;
 using System.Reflection.Emit;
 using System.Windows.Forms;
 
-public class StyledTooltip : Form
+namespace AdventureWorksGraph
 {
-    private Label label;
-
-    public StyledTooltip()
+    public class StyledTooltip : Form
     {
-        this.FormBorderStyle = FormBorderStyle.None;
-        this.BackColor = ColorTranslator.FromHtml("#fde8dc"); 
-        this.StartPosition = FormStartPosition.Manual;
-        this.ShowInTaskbar = false;
-        this.TopMost = true;
-        this.Padding = new Padding(8);
-        this.AutoSize = true;
-        this.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+        private System.Windows.Forms.Label label;
 
-        label = new Label
+        public StyledTooltip()
         {
-            AutoSize = true,
-            ForeColor = System.Drawing.Color.FromArgb(51, 51, 51),
-            Font = new System.Drawing.Font("Segoe UI", 9, FontStyle.Italic),
-            BackColor = System.Drawing.Color.Transparent
-        };
+            this.FormBorderStyle = FormBorderStyle.None;
+            this.BackColor = ColorTranslator.FromHtml("#fde8dc");
+            this.StartPosition = FormStartPosition.Manual;
+            this.ShowInTaskbar = false;
+            this.TopMost = true;
+            this.Padding = new Padding(8);
+            this.AutoSize = true;
+            this.AutoSizeMode = AutoSizeMode.GrowAndShrink;
 
-        this.Controls.Add(label);
+            label = new System.Windows.Forms.Label
+            {
+                AutoSize = true,
+                ForeColor = System.Drawing.Color.FromArgb(51, 51, 51),
+                Font = new System.Drawing.Font("Segoe UI", 9, FontStyle.Italic),
+                BackColor = System.Drawing.Color.Transparent
+            };
+
+            this.Controls.Add(label);
+        }
+
+        public void ShowTooltip(string text, Point screenLocation)
+        {
+            label.Text = text;
+            this.Location = screenLocation;
+            this.Show();
+        }
+
+        public void HideTooltip()
+        {
+            this.Hide();
+        }
     }
 
-    public void ShowTooltip(string text, Point screenLocation)
-    {
-        label.Text = text;
-        this.Location = screenLocation;
-        this.Show();
-    }
-
-    public void HideTooltip()
-    {
-        this.Hide();
-    }
 }
+
+

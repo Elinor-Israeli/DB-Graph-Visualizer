@@ -1,5 +1,5 @@
 ﻿// Bring in models, SQL queries, and ADO.NET tools for database access
-using AdventureWorksGraph.Models;
+using AdventureWorksGraph;
 using AdventureWorksGraph.SqlQueries;
 using System.Collections.Generic;
 using System.Data.SqlClient;

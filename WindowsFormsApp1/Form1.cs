@@ -1,5 +1,4 @@
-﻿using AdventureWorksGraph.Models;
-using AdventureWorksGraph.Services;
+﻿using AdventureWorksGraph.Services;
 using Microsoft.Msagl.Drawing;
 using Microsoft.Msagl.GraphViewerGdi;
 using System;
@@ -16,6 +15,8 @@ namespace AdventureWorksGraph
     {
         private Graph _graph;
         private Dictionary<Edge, string> _edgeDescriptions = new();
+
+        private StyledTooltip styledTooltip = new StyledTooltip();
 
         public Form1()
         {
@@ -96,13 +97,18 @@ namespace AdventureWorksGraph
         {
             if (viewer.ObjectUnderMouseCursor?.DrawingObject is Edge edge)
             {
-                viewer.SetToolTip(new ToolTip(), _edgeDescriptions.TryGetValue(edge, out var desc) ? desc : "");
+                if (_edgeDescriptions.TryGetValue(edge, out var desc))
+                {
+                    Point mouseScreen = Cursor.Position;
+                    styledTooltip.ShowTooltip(desc, new Point(mouseScreen.X + 10, mouseScreen.Y + 10));
+                }
             }
             else
             {
-                viewer.SetToolTip(new ToolTip(), "");
+                styledTooltip.HideTooltip();
             }
         }
+
 
         private bool DrawCustomNode(Microsoft.Msagl.Drawing.Node node, object graphics)
         {

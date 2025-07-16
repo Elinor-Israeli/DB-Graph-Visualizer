@@ -1,5 +1,5 @@
 ﻿// Namespace for all data model classes in the application
-namespace AdventureWorksGraph.Models
+namespace AdventureWorksGraph
 {
     /// <summary>
     /// Represents a foreign key relationship between two database tables.
