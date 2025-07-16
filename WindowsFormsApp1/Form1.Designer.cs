@@ -1,4 +1,4 @@
-﻿namespace AdventureWorksGraph
+﻿namespace DBGraphVisualizer
 {
     partial class Form1
     {

@@ -1,10 +1,9 @@
 ﻿// Bring in models, SQL queries, and ADO.NET tools for database access
-using AdventureWorksGraph;
-using AdventureWorksGraph.SqlQueries;
+using DBGraphVisualizer.Models;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 
-namespace AdventureWorksGraph.Services
+namespace DBGraphVisualizer.Services
 {
     /// <summary>
     /// This static class handles loading database schema info (tables, keys, relationships)

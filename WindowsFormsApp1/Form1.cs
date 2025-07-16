@@ -1,6 +1,6 @@
-﻿using AdventureWorksGraph.Services;
+﻿using DBGraphVisualizer.Models;
+using DBGraphVisualizer.Services;
 using Microsoft.Msagl.Drawing;
-using Microsoft.Msagl.GraphViewerGdi;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using Microsoft.Msagl.Core.Geometry.Curves;
 
 
-namespace AdventureWorksGraph
+namespace DBGraphVisualizer
 {
     public partial class Form1 : Form
     {

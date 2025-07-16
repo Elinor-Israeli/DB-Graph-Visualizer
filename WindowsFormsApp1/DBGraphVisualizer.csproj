@@ -104,8 +104,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Models\Relationship.cs" />
     <Compile Include="Services\SchemaLoader.cs" />
-    <Compile Include="SqlQueries\SqlQueries.cs" />
-	<Compile Include="StyledTooltip.cs" />
+    <Compile Include="Services\SqlQueries.cs" />
+    <Compile Include="StyledTooltip.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

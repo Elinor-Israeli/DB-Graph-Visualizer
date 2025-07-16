@@ -1,5 +1,5 @@
 ﻿// Namespace that stores all reusable SQL query strings for loading schema information
-namespace AdventureWorksGraph.SqlQueries
+namespace DBGraphVisualizer.Services
 {
     /// <summary>
     /// Provides SQL queries for extracting table metadata (keys and relationships)
