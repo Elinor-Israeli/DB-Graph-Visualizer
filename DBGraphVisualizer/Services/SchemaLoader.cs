@@ -12,7 +12,6 @@ namespace DBGraphVisualizer.Services
     /// </summary>
     public static class SchemaLoader
     {
-        //private const string ConnectionString = "Server=localhost;Database=AdventureWorks2022;Trusted_Connection=True;";
         private const string ConnectionString = "Server=IZHAK-LENOVO\\ELINORSQLSERVER;Database=AdventureWorks2022;Trusted_Connection=True;";
 
 

@@ -7,23 +7,62 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using Microsoft.Msagl.Core.Geometry.Curves;
-using Microsoft.Msagl.Core.Layout.ProximityOverlapRemoval.StressEnergy;
-using System.Linq;
-
 
 namespace DBGraphVisualizer
 {
-    public partial class GraphForm : Form
+    public class GraphForm : Form
     {
         private Graph _graph;
         private Dictionary<Edge, string> _edgeDescriptions = new();
+        private System.ComponentModel.IContainer _components = null;
+        private Microsoft.Msagl.GraphViewerGdi.GViewer _viewer;
+        private StyledTooltip _styledTooltip = new StyledTooltip();
 
-        private StyledTooltip styledTooltip = new StyledTooltip();
+        private const int ViewerWidth = 800;
+        private const int ViewerHeight = 450;
+
+        private static readonly Font SugiFont = new Font("Segoe UI", 9, System.Drawing.FontStyle.Bold);
+        private static readonly System.Drawing.Color LightCream = ColorTranslator.FromHtml("#fffff0");
+        private static readonly System.Drawing.Color DarkBlue = ColorTranslator.FromHtml("#2b579a");
 
         public GraphForm()
         {
             InitializeComponent();
             Load += GraphForm_Load;
+        }
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (_components != null))
+            {
+                _components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        private void InitializeComponent()
+        {
+            this._viewer = new Microsoft.Msagl.GraphViewerGdi.GViewer();
+            this.SuspendLayout();
+
+            // viewer
+            this._viewer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._viewer.Name = "viewer";
+            this._viewer.Size = new System.Drawing.Size(ViewerWidth, ViewerHeight);
+            this._viewer.TabIndex = 0;
+
+            // GraphForm
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(ViewerWidth, ViewerHeight);
+            this.Controls.Add(this._viewer);
+            this.Name = "GraphForm";
+            this.Text = "Database Graph Viewer";
+            this.ResumeLayout(false);
         }
 
         private void GraphForm_Load(object sender, EventArgs e)
@@ -41,8 +80,8 @@ namespace DBGraphVisualizer
                 NodeSeparation = 100
             };
 
-            viewer.Graph = _graph;
-            viewer.ObjectUnderMouseCursorChanged += Viewer_ObjectUnderMouseCursorChanged;
+            _viewer.Graph = _graph;
+            _viewer.ObjectUnderMouseCursorChanged += Viewer_ObjectUnderMouseCursorChanged;
         }
 
         private void AddTableNodes(Graph graph, Dictionary<string, Table> tables)
@@ -84,14 +123,13 @@ namespace DBGraphVisualizer
             if (node.UserData is Table table)
             {
                 using var g = CreateGraphics();
-                using var font = new Font("Segoe UI", 9, System.Drawing.FontStyle.Bold);
 
-                var headerSize = g.MeasureString(node.LabelText, font);
+                var headerSize = g.MeasureString(node.LabelText, SugiFont);
                 height += headerSize.Height + 6;
 
                 foreach (var key in table.AllKeys)
                 {
-                    var keySize = g.MeasureString(key, font);
+                    var keySize = g.MeasureString(key, SugiFont);
                     height += keySize.Height + 6;
                     width = Math.Max(width, keySize.Width + 20);
                 }
@@ -104,17 +142,17 @@ namespace DBGraphVisualizer
 
         private void Viewer_ObjectUnderMouseCursorChanged(object sender, ObjectUnderMouseCursorChangedEventArgs e)
         {
-            if (viewer.ObjectUnderMouseCursor?.DrawingObject is Edge edge)
+            if (_viewer.ObjectUnderMouseCursor?.DrawingObject is Edge edge)
             {
                 if (_edgeDescriptions.TryGetValue(edge, out var desc))
                 {
                     Point mouseScreen = Cursor.Position;
-                    styledTooltip.ShowTooltip(desc, new Point(mouseScreen.X + 10, mouseScreen.Y + 10));
+                    _styledTooltip.ShowTooltip(desc, new Point(mouseScreen.X + 10, mouseScreen.Y + 10));
                 }
             }
             else
             {
-                styledTooltip.HideTooltip();
+                _styledTooltip.HideTooltip();
             }
         }
 
@@ -146,33 +184,31 @@ namespace DBGraphVisualizer
                 path.AddArc(x, y + height - cornerRadius, cornerRadius, cornerRadius, 90, 90);
                 path.CloseFigure();
 
-                g.FillPath(new SolidBrush(ColorTranslator.FromHtml("#fffff0")), path); // light cream
+                g.FillPath(new SolidBrush(LightCream), path);
                 g.DrawPath(Pens.LightGray, path);
             }
 
             // Header background
-            g.FillRectangle(new SolidBrush(ColorTranslator.FromHtml("#2b579a")), x, y, width, headerHeight);
+            g.FillRectangle(new SolidBrush(DarkBlue), x, y, width, headerHeight);
 
             // Header text
-            using var headerFont = new Font("Segoe UI", 9, System.Drawing.FontStyle.Bold);
-            using var headerBrush = new SolidBrush(ColorTranslator.FromHtml("#fffff0"));
+            using var headerBrush = new SolidBrush(LightCream);
             string headerText = node.LabelText ?? node.Id;
-            var headerSize = g.MeasureString(headerText, headerFont);
-            g.DrawString(headerText, headerFont, headerBrush, x + (width - headerSize.Width) / 2, y + 4);
+            var headerSize = g.MeasureString(headerText, SugiFont);
+            g.DrawString(headerText, SugiFont, headerBrush, x + (width - headerSize.Width) / 2, y + 4);
 
             // Keys
             if (node.UserData is Table table)
             {
-                using var keyFont = new Font("Segoe UI", 9, System.Drawing.FontStyle.Bold);
-                using var keyBrush = new SolidBrush(ColorTranslator.FromHtml("#2b579a"));
+                using var keyBrush = new SolidBrush(DarkBlue);
 
                 float yOffset = y + headerHeight + 6;
 
                 foreach (var pk in table.AllKeys)
                 {
-                    var keySize = g.MeasureString(pk, keyFont);
-                    g.DrawString(pk, keyFont, keyBrush, x + (width - keySize.Width) / 2, yOffset);
-                    yOffset += keyFont.Height + 4;
+                    var keySize = g.MeasureString(pk, SugiFont);
+                    g.DrawString(pk, SugiFont, keyBrush, x + (width - keySize.Width) / 2, yOffset);
+                    yOffset += SugiFont.Height + 4;
                 }
             }
 
@@ -194,7 +230,7 @@ namespace DBGraphVisualizer
             double length = Math.Sqrt(dx * dx + dy * dy);
             if (length == 0) return true;
 
-            viewer.Paint += (sender, e) =>
+            _viewer.Paint += (sender, e) =>
             {
                 var g = e.Graphics;
 
