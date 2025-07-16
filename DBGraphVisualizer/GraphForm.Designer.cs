@@ -36,7 +36,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.viewer);
-            this.Name = "Form1";
+            this.Name = "GraphForm";
             this.Text = "Database Graph Viewer";
             this.ResumeLayout(false);
         }

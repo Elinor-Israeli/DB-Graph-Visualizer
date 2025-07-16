@@ -2,6 +2,7 @@
 using DBGraphVisualizer.Models;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Linq;
 
 namespace DBGraphVisualizer.Services
 {
@@ -37,7 +38,7 @@ namespace DBGraphVisualizer.Services
         /// <returns>
         /// A list of Relationship objects representing foreign key links.
         /// </returns>
-        public static List<Relationship> LoadRelationships()
+        public static List<Relationship> LoadRelationships(Dictionary<string, Table> tables)
         {
             var relationships = new List<Relationship>();
 
@@ -50,16 +51,17 @@ namespace DBGraphVisualizer.Services
             // Read each row: FromTable.FromColumn ➝ ToTable.ToColumn
             while (reader.Read())
             {
+                var fromTable = reader.GetString(0);
+                var fromColumn = reader.GetString(1);
                 relationships.Add(new Relationship
                 {
-                    FromTable = reader.GetString(0),
-                    FromColumn = reader.GetString(1),
+                    FromTable = fromTable,
                     ToTable = reader.GetString(2),
-                    ToColumn = reader.GetString(3)
+                    IsUnique  =tables[fromTable].PrimaryKeys.Contains(fromColumn),
                 });
             }
 
-            return relationships;
+            return relationships.GroupBy(p => new { p.FromTable, p.ToTable }).Select(g => g.First()).ToList();
         }
 
         /// <summary>

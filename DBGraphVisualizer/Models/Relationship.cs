@@ -7,8 +7,7 @@ namespace DBGraphVisualizer.Models
     public class Relationship
     {
         public string FromTable { get; set; }
-        public string FromColumn { get; set; }
         public string ToTable { get; set; }
-        public string ToColumn { get; set; }
+        public bool IsUnique { get; set; }
     }
 }

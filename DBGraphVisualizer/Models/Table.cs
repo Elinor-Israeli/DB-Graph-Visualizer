@@ -1,6 +1,7 @@
 ﻿
 // Namespace for all model classes used in the AdventureWorksGraph application
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DBGraphVisualizer.Models
 {
@@ -13,6 +14,15 @@ namespace DBGraphVisualizer.Models
         public string Name { get; set; }
         public List<string> PrimaryKeys { get; set; } = new();
         public List<string> ForeignKeys { get; set; } = new();
+
+        public List<string> AllKeys
+        {
+            get
+            {
+                return PrimaryKeys.Concat(ForeignKeys).Distinct().ToList();
+            }
+
+        }
         
     }
 }

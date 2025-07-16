@@ -7,6 +7,8 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using Microsoft.Msagl.Core.Geometry.Curves;
+using Microsoft.Msagl.Core.Layout.ProximityOverlapRemoval.StressEnergy;
+using System.Linq;
 
 
 namespace DBGraphVisualizer
@@ -27,7 +29,7 @@ namespace DBGraphVisualizer
         private void GraphForm_Load(object sender, EventArgs e)
         {
             Dictionary<string, Table> tables = SchemaLoader.LoadTables();
-            List<Relationship> relationships = SchemaLoader.LoadRelationships();
+            List<Relationship> relationships = SchemaLoader.LoadRelationships(tables);
 
             _graph = new Graph("Database Schema");
             AddTableNodes(_graph, tables);
@@ -63,14 +65,21 @@ namespace DBGraphVisualizer
                 var edge = graph.AddEdge(rel.FromTable, rel.ToTable);
                 edge.Attr.ArrowheadAtTarget = ArrowStyle.None;
                 edge.DrawEdgeDelegate = new DelegateToOverrideEdgeRendering(DrawCustomEdge);
-                _edgeDescriptions[edge] = $"{rel.FromTable}.{rel.FromColumn} ➝ {rel.ToTable}.{rel.ToColumn}";
+                if (rel.IsUnique)
+                {
+                     _edgeDescriptions[edge] = $"each {rel.ToTable} can only have one {rel.FromTable}";
+                }
+                else
+                {
+                    _edgeDescriptions[edge] = $"each {rel.ToTable} may have multiple {rel.FromTable}s";
+                }
             }
         }
 
         private ICurve GetNodeBoundary(Microsoft.Msagl.Drawing.Node node)
         {
             float width = 120;
-            float height = 30;
+            float height = 0;
 
             if (node.UserData is Table table)
             {
@@ -78,9 +87,9 @@ namespace DBGraphVisualizer
                 using var font = new Font("Segoe UI", 9, System.Drawing.FontStyle.Bold);
 
                 var headerSize = g.MeasureString(node.LabelText, font);
-                height += headerSize.Height;
+                height += headerSize.Height + 6;
 
-                foreach (var key in table.PrimaryKeys)
+                foreach (var key in table.AllKeys)
                 {
                     var keySize = g.MeasureString(key, font);
                     height += keySize.Height + 6;
@@ -159,9 +168,10 @@ namespace DBGraphVisualizer
 
                 float yOffset = y + headerHeight + 6;
 
-                foreach (var pk in table.PrimaryKeys)
+                foreach (var pk in table.AllKeys)
                 {
-                    g.DrawString(pk, keyFont, keyBrush, x + 10, yOffset);
+                    var keySize = g.MeasureString(pk, keyFont);
+                    g.DrawString(pk, keyFont, keyBrush, x + (width - keySize.Width) / 2, yOffset);
                     yOffset += keyFont.Height + 4;
                 }
             }
@@ -176,7 +186,7 @@ namespace DBGraphVisualizer
             var curve = edge.GeometryEdge?.Curve;
             if (curve == null) return false;
 
-            using var pen = new Pen(System.Drawing.Color.LightSlateGray, 1.5f);
+            var pen = new Pen(System.Drawing.Color.LightSkyBlue, 1.5f);
             g.DrawLine(pen, (float)curve.Start.X, (float)curve.Start.Y, (float)curve.End.X, (float)curve.End.Y);
 
             double dx = curve.End.X - curve.Start.X;
@@ -184,17 +194,19 @@ namespace DBGraphVisualizer
             double length = Math.Sqrt(dx * dx + dy * dy);
             if (length == 0) return true;
 
-            double backOffset = 5.0;
-            double offsetX = backOffset * dx / length;
-            double offsetY = backOffset * dy / length;
+            viewer.Paint += (sender, e) =>
+            {
+                var g = e.Graphics;
 
-            float circleX = (float)(curve.End.X - offsetX - 3);
-            float circleY = (float)(curve.End.Y - offsetY - 3);
-            float radius = 6f;
+                float circleX = (float)(curve.Start.X - 5);
+                float circleY = (float)(curve.Start.Y - 5);
 
-            using var brush = new SolidBrush(System.Drawing.Color.LightSkyBlue);
-            g.FillEllipse(brush, circleX, circleY, radius, radius);
-            g.DrawEllipse(Pens.LightGray, circleX, circleY, radius, radius);
+                float radius = 10f;
+
+                var brush = new SolidBrush(System.Drawing.Color.LightSkyBlue);
+                g.FillEllipse(brush, circleX, circleY, radius, radius);
+                g.DrawEllipse(Pens.LightSkyBlue, circleX, circleY, radius, radius);
+            };
 
             return true;
         }
