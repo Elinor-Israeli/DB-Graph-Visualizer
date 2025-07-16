@@ -18,8 +18,8 @@ namespace DBGraphVisualizer
         private Microsoft.Msagl.GraphViewerGdi.GViewer _viewer;
         private StyledTooltip _styledTooltip = new StyledTooltip();
 
-        private const int ViewerWidth = 800;
-        private const int ViewerHeight = 450;
+        private static readonly int ViewerWidth = Screen.PrimaryScreen.Bounds.Width;
+        private static readonly int ViewerHeight = Screen.PrimaryScreen.Bounds.Height;
 
         private static readonly Font SugiFont = new Font("Segoe UI", 9, System.Drawing.FontStyle.Bold);
         private static readonly System.Drawing.Color LightCream = ColorTranslator.FromHtml("#fffff0");
@@ -28,6 +28,7 @@ namespace DBGraphVisualizer
         public GraphForm()
         {
             InitializeComponent();
+            this.Size = new Size(ViewerWidth, ViewerHeight);
             Load += GraphForm_Load;
         }
 
@@ -44,6 +45,10 @@ namespace DBGraphVisualizer
             base.Dispose(disposing);
         }
 
+        /// <summary>
+        /// Initializes the components and layout of the <see cref="GraphForm"/>, 
+        /// including setting up the MSAGL graph viewer control and form properties.
+        /// </summary>
         private void InitializeComponent()
         {
             this._viewer = new Microsoft.Msagl.GraphViewerGdi.GViewer();
@@ -65,6 +70,13 @@ namespace DBGraphVisualizer
             this.ResumeLayout(false);
         }
 
+        /// <summary>
+        /// Handles the form load event by initializing and rendering the database schema graph.
+        /// Loads tables and relationships from the schema, adds them to the MSAGL graph, 
+        /// sets layout settings, and assigns the graph to the viewer.
+        /// </summary>
+        /// <param name="sender">The source of the event, typically the <see cref="GraphForm"/> itself.</param>
+        /// <param name="e">Event arguments associated with the form load event.</param>
         private void GraphForm_Load(object sender, EventArgs e)
         {
             Dictionary<string, Table> tables = SchemaLoader.LoadTables();
@@ -84,6 +96,12 @@ namespace DBGraphVisualizer
             _viewer.ObjectUnderMouseCursorChanged += Viewer_ObjectUnderMouseCursorChanged;
         }
 
+        /// <summary>
+        /// Adds table nodes to the MSAGL graph, assigning custom shapes, labels,
+        /// boundary rendering, and user data based on the provided table metadata.
+        /// </summary>
+        /// <param name="graph">The MSAGL graph to which the table nodes will be added.</param>
+        /// <param name="tables">A dictionary of table names and their metadata used to create nodes.</param>
         private void AddTableNodes(Graph graph, Dictionary<string, Table> tables)
         {
             foreach (var table in tables.Values)
@@ -97,6 +115,12 @@ namespace DBGraphVisualizer
             }
         }
 
+        // <summary>
+        /// Adds edges to the MSAGL graph representing relationships between tables,
+        /// applies custom rendering, and stores a textual description of each relationship.
+        /// </summary>
+        /// <param name="graph">The MSAGL graph to which the edges will be added.</param>
+        /// <param name="relationships">A list of table relationships defining the graph's edges and their cardinality.</param>
         private void AddEdgesWithDescriptions(Graph graph, List<Relationship> relationships)
         {
             foreach (var rel in relationships)
@@ -104,6 +128,7 @@ namespace DBGraphVisualizer
                 var edge = graph.AddEdge(rel.FromTable, rel.ToTable);
                 edge.Attr.ArrowheadAtTarget = ArrowStyle.None;
                 edge.DrawEdgeDelegate = new DelegateToOverrideEdgeRendering(DrawCustomEdge);
+                
                 if (rel.IsUnique)
                 {
                      _edgeDescriptions[edge] = $"each {rel.ToTable} can only have one {rel.FromTable}";
@@ -115,6 +140,16 @@ namespace DBGraphVisualizer
             }
         }
 
+        // <summary>
+        /// Calculates a custom rectangular boundary curve for a given MSAGL node,
+        /// based on the content of its associated table (header and keys).
+        /// </summary>
+        /// <param name="node">The MSAGL node whose boundary is to be calculated. 
+        /// The node is expected to have a <c>UserData</c> of type <c>Table</c> with a list of keys.</param>
+        /// <returns>
+        /// A rectangle-shaped <see cref="Microsoft.Msagl.Core.Geometry.Curves.ICurve"/> 
+        /// representing the node's visual boundary, sized dynamically based on its content.
+        /// </returns>
         private ICurve GetNodeBoundary(Microsoft.Msagl.Drawing.Node node)
         {
             float width = 120;
@@ -140,6 +175,14 @@ namespace DBGraphVisualizer
             return Microsoft.Msagl.Core.Geometry.Curves.CurveFactory.CreateRectangle(width, height, new Microsoft.Msagl.Core.Geometry.Point());
         }
 
+        /// <summary>
+        /// Handles changes to the object under the mouse cursor in the MSAGL viewer.
+        /// If the cursor is over an edge, displays a styled tooltip with a description of the relationship.
+        /// Otherwise, hides the tooltip.
+        /// </summary>
+        /// <param name="sender">The source of the event, typically the viewer control.</param>
+        /// <param name="e">The event data containing the object currently under the mouse cursor.</param>
+
         private void Viewer_ObjectUnderMouseCursorChanged(object sender, ObjectUnderMouseCursorChangedEventArgs e)
         {
             if (_viewer.ObjectUnderMouseCursor?.DrawingObject is Edge edge)
@@ -156,7 +199,13 @@ namespace DBGraphVisualizer
             }
         }
 
-
+        /// <summary>
+        /// Custom rendering logic for drawing a table node in the graph, including a rounded rectangle shape,
+        /// a colored header, and a list of keys.
+        /// </summary>
+        /// <param name="node">The MSAGL node to be drawn, expected to contain a <see cref="Table"/> in its UserData.</param>
+        /// <param name="graphics">The graphics object used for custom rendering.</param>
+        /// <returns>Returns <c>true</c> if the node was successfully drawn.</returns>
         private bool DrawCustomNode(Microsoft.Msagl.Drawing.Node node, object graphics)
         {
             var g = (Graphics)graphics;
@@ -216,13 +265,20 @@ namespace DBGraphVisualizer
             return true;
         }
 
+        /// <summary>
+        /// Custom rendering logic for drawing an edge (relationship) between two table nodes,
+        /// including a styled line and a small circle at the start of the edge.
+        /// </summary>
+        /// <param name="edge">The MSAGL edge to be drawn, representing a relationship between tables.</param>
+        /// <param name="graphics">The graphics object used for drawing the edge.</param>
+        /// <returns>Returns <c>true</c> if the edge was successfully drawn.</returns>
         private bool DrawCustomEdge(Edge edge, object graphics)
         {
             var g = (Graphics)graphics;
             var curve = edge.GeometryEdge?.Curve;
             if (curve == null) return false;
 
-            var pen = new Pen(System.Drawing.Color.LightSkyBlue, 1.5f);
+            var pen = new Pen(System.Drawing.Color.LightSkyBlue, 0.01f);
             g.DrawLine(pen, (float)curve.Start.X, (float)curve.Start.Y, (float)curve.End.X, (float)curve.End.Y);
 
             double dx = curve.End.X - curve.Start.X;
