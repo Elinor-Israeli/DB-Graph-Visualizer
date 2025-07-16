@@ -1,6 +1,6 @@
 ﻿namespace DBGraphVisualizer
 {
-    partial class Form1
+    partial class GraphForm
     {
         private System.ComponentModel.IContainer components = null;
         private Microsoft.Msagl.GraphViewerGdi.GViewer viewer;

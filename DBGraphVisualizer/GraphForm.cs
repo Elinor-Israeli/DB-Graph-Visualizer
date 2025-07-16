@@ -11,20 +11,20 @@ using Microsoft.Msagl.Core.Geometry.Curves;
 
 namespace DBGraphVisualizer
 {
-    public partial class Form1 : Form
+    public partial class GraphForm : Form
     {
         private Graph _graph;
         private Dictionary<Edge, string> _edgeDescriptions = new();
 
         private StyledTooltip styledTooltip = new StyledTooltip();
 
-        public Form1()
+        public GraphForm()
         {
             InitializeComponent();
-            Load += Form1_Load;
+            Load += GraphForm_Load;
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private void GraphForm_Load(object sender, EventArgs e)
         {
             Dictionary<string, Table> tables = SchemaLoader.LoadTables();
             List<Relationship> relationships = SchemaLoader.LoadRelationships();

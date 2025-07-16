@@ -93,11 +93,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Form1.cs">
+    <Compile Include="GraphForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <Compile Include="GraphForm.Designer.cs">
+      <DependentUpon>GraphForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\Table.cs" />
     <Compile Include="Program.cs" />
