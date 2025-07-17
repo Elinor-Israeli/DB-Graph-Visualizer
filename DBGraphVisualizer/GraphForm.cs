@@ -135,7 +135,7 @@ namespace DBGraphVisualizer
                 }
                 else
                 {
-                    _edgeDescriptions[edge] = $"each **{rel.ToTable}** may have multiple **{rel.FromTable}**s";
+                    _edgeDescriptions[edge] = $"each **{rel.ToTable}** may have multiple **{rel.FromTable}s**";
                 }
             }
         }

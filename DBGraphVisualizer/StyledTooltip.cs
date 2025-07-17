@@ -29,7 +29,7 @@ namespace DBGraphVisualizer
             var g = e.Graphics;
             var regularFont = new Font("Segoe UI", 9, FontStyle.Regular);
             var boldItalicFont = new Font("Segoe UI", 9, FontStyle.Bold | FontStyle.Italic);
-            var brush = new SolidBrush(Color.FromArgb(51, 51, 51));
+            var brush = new SolidBrush(Color.FromArgb(43, 87, 154));
 
             float x = 10f;
             float y = 10f;
@@ -48,7 +48,7 @@ namespace DBGraphVisualizer
                 }
 
                 g.DrawString(displayText, font, brush, x, y);
-                x += g.MeasureString(displayText, font).Width;
+                x += g.MeasureString(displayText, regularFont).Width;
             }
         }
 
