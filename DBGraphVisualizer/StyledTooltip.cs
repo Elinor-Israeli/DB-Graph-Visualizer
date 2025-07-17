@@ -7,9 +7,16 @@ using System.Windows.Forms;
 
 namespace DBGraphVisualizer
 {
+    /// <summary>
+    /// A custom tooltip form that supports basic text styling using **bold italic** markers.
+    /// </summary>
     public class StyledTooltip : Form
     {
         private string _text = "";
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StyledTooltip"/> class.
+        /// </summary>
 
         public StyledTooltip()
         {
@@ -22,6 +29,10 @@ namespace DBGraphVisualizer
             this.DoubleBuffered = true;
         }
 
+        /// <summary>
+        /// Paints the styled tooltip text onto the form using basic markdown-style formatting.
+        /// </summary>
+        /// <param name="e">Paint event arguments.</param>
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
@@ -51,6 +62,11 @@ namespace DBGraphVisualizer
                 x += g.MeasureString(displayText, regularFont).Width;
             }
         }
+        /// <summary>
+        /// Displays the tooltip at the specified screen location with styled content.
+        /// </summary>
+        /// <param name="text">The text to display. Use **...** to apply bold italic styling.</param>
+        /// <param name="screenLocation">The location on the screen where the tooltip should appear.</param>
 
         public void ShowTooltip(string text, Point screenLocation)
         {

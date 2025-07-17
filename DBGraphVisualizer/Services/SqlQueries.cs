@@ -3,7 +3,7 @@ namespace DBGraphVisualizer.Services
 {
     /// <summary>
     /// Provides SQL queries for extracting table metadata (keys and relationships)
-    /// from the AdventureWorks SQL Server database.
+    /// from SQL Server database.
     /// </summary>
     public static class SchemaSql
     {

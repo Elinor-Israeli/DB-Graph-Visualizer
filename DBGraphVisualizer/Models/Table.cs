@@ -1,5 +1,5 @@
 ﻿
-// Namespace for all model classes used in the AdventureWorksGraph application
+// Namespace for all model classes used in the DBGraphVisualizer application
 using System.Collections.Generic;
 using System.Linq;
 

@@ -8,7 +8,7 @@ namespace DBGraphVisualizer.Services
 {
     /// <summary>
     /// This static class handles loading database schema info (tables, keys, relationships)
-    /// from the AdventureWorks SQL Server database.
+    /// from the SQL Server database.
     /// </summary>
     public static class SchemaLoader
     {
