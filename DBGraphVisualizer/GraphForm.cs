@@ -131,11 +131,11 @@ namespace DBGraphVisualizer
                 
                 if (rel.IsUnique)
                 {
-                     _edgeDescriptions[edge] = $"each {rel.ToTable} can only have one {rel.FromTable}";
+                     _edgeDescriptions[edge] = $"each **{rel.ToTable}** can only have one **{rel.FromTable}**";
                 }
                 else
                 {
-                    _edgeDescriptions[edge] = $"each {rel.ToTable} may have multiple {rel.FromTable}s";
+                    _edgeDescriptions[edge] = $"each **{rel.ToTable}** may have multiple **{rel.FromTable}**s";
                 }
             }
         }
